@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@theme {
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Space Grotesk', ui-sans-serif, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-[#F4F4F0] text-[#111111] min-h-screen selection:bg-[#FF4A00] selection:text-white;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+
+  /* Override basic inputs to be huge, raw, and editorial */
+  .focus-ink {
+    @apply focus:outline-none focus:ring-0 focus:border-[#FF4A00];
+  }
+}
