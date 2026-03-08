@@ -60,21 +60,25 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-8">
-            <div class="group">
-              <label class="block text-[10px] font-bold uppercase tracking-[0.2em] mb-3 text-[#777] group-focus-within:text-[#FF4A00] transition-colors">Start Date</label>
-              <input type="date" v-model="form.startDate" class="w-full bg-transparent border-b-2 border-[#111111] pb-3 text-sm font-mono font-bold focus:outline-none focus:border-[#FF4A00] rounded-none text-[#111]" required>
-            </div>
-            <div class="group">
-              <label class="block text-[10px] font-bold uppercase tracking-[0.2em] mb-3 text-[#777] group-focus-within:text-[#FF4A00] transition-colors">End Date</label>
-              <input type="date" v-model="form.endDate" class="w-full bg-transparent border-b-2 border-[#111111] pb-3 text-sm font-mono font-bold focus:outline-none focus:border-[#FF4A00] rounded-none text-[#111]" required>
-            </div>
-          </div>
+           <div class="grid grid-cols-2 gap-8">
+             <div class="group">
+               <label class="block text-[10px] font-bold uppercase tracking-[0.2em] mb-3 text-[#777] group-focus-within:text-[#FF4A00] transition-colors">Start Date</label>
+               <input type="date" v-model="form.startDate" class="w-full bg-transparent border-b-2 border-[#111111] pb-3 text-sm font-mono font-bold focus:outline-none focus:border-[#FF4A00] rounded-none text-[#111]" required>
+             </div>
+             <div class="group">
+               <label class="block text-[10px] font-bold uppercase tracking-[0.2em] mb-3 text-[#777] group-focus-within:text-[#FF4A00] transition-colors">End Date</label>
+               <input type="date" v-model="form.endDate" :min="form.startDate" class="w-full bg-transparent border-b-2 border-[#111111] pb-3 text-sm font-mono font-bold focus:outline-none focus:border-[#FF4A00] rounded-none text-[#111]" required>
+             </div>
+           </div>
 
-          <div class="group">
-            <label class="block text-[10px] font-bold uppercase tracking-[0.2em] mb-3 text-[#777] group-focus-within:text-[#FF4A00] transition-colors">Reason for Leave</label>
-            <textarea v-model="form.reason" rows="3" class="w-full bg-transparent border-b-2 border-[#111111] pb-3 text-base font-medium focus:outline-none focus:border-[#FF4A00] resize-none rounded-none placeholder:text-[#999] leading-relaxed text-[#111]" placeholder="Provide a brief explanation..." required></textarea>
-          </div>
+           <div class="group">
+             <label class="block text-[10px] font-bold uppercase tracking-[0.2em] mb-3 text-[#777] group-focus-within:text-[#FF4A00] transition-colors">Reason for Leave</label>
+             <textarea v-model="form.reason" rows="3" class="w-full bg-transparent border-b-2 border-[#111111] pb-3 text-base font-medium focus:outline-none focus:border-[#FF4A00] resize-none rounded-none placeholder:text-[#999] leading-relaxed text-[#111]" placeholder="Provide a brief explanation..." required></textarea>
+           </div>
+
+           <div v-if="error" class="bg-[#FF4A00] text-white p-4 font-mono text-[11px] font-bold uppercase tracking-wide">
+             {{ error }}
+           </div>
 
           <button type="submit" class="w-full bg-[#111111] text-[#F4F4F0] py-6 font-bold text-[13px] uppercase tracking-[0.2em] hover:bg-[#FF4A00] transition-all shadow-[8px_8px_0px_transparent] hover:shadow-[10px_10px_0px_#111111] active:translate-y-1 active:translate-x-1 active:shadow-none mt-4" :disabled="submitLoading">
             {{ submitLoading ? 'SUBMITTING...' : 'SUBMIT REQUEST \u2192' }}
@@ -145,7 +149,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import api from '../axios'
 
 const userName = ref(localStorage.getItem('name') || 'Employee')
@@ -176,6 +180,10 @@ const fetchLeaves = async () => {
 const applyLeave = async () => {
   try {
     error.value = ''
+    if (form.value.startDate && form.value.endDate && form.value.endDate < form.value.startDate) {
+      error.value = 'End date must be the same as or after the start date.'
+      return
+    }
     submitLoading.value = true
     await api.post('/leaves', form.value)
     form.value = { leaveType: '', startDate: '', endDate: '', reason: '' }
@@ -186,6 +194,15 @@ const applyLeave = async () => {
     submitLoading.value = false
   }
 }
+
+watch(
+  () => form.value.startDate,
+  (start) => {
+    if (start && form.value.endDate && form.value.endDate < start) {
+      form.value.endDate = start
+    }
+  }
+)
 
 // Fixed Monospace formatting
 const formatDate = (dateString) => {

@@ -87,6 +87,12 @@ Backend:
 - `POST /api/leaves` -> employee only (create request)
 - `PUT /api/leaves/:id` -> employer only (set `status` to `Approved` or `Rejected`)
 
+## Screenshots
+
+![Login](docs/screenshots/login.png)
+
+![Employee dashboard](docs/screenshots/employee-dashboard.png)
+
 ## Notes
 
 - Auth is enforced server-side via `Authorization: Bearer <token>`.
